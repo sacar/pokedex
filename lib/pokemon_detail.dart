@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:pokedex/pokemon.dart';
 import 'package:pokedex/pokemon_detail_expanded.dart';
+import 'package:pokedex/pokemon_type_color.dart';
 
 import 'custom_clipper.dart';
 import 'nested_tab_bar.dart';
 
 class PokemonDetails extends StatelessWidget {
+  final pokemonNew;
+
+  PokemonDetails({this.pokemonNew});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -14,7 +20,7 @@ class PokemonDetails extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => PokemonDetailsExpanded()));
+                  builder: (context) => PokemonDetailsExpanded(pokemon: pokemonNew,)));
         }
       },
       child: Stack(
@@ -22,7 +28,9 @@ class PokemonDetails extends StatelessWidget {
           Container(color: Colors.white),
           ClipPath(
             child: Container(
-              color: Color(0xFFF8A54F),
+              color: PokemonTypeColor()
+                  .getColor(pokemonNew.types.elementAt(0))
+                  .item1,
             ),
             clipper: ObliqueLineClipper(),
           ),
@@ -35,7 +43,7 @@ class PokemonDetails extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.fromLTRB(8.0, 14.0, 12.0, 8.0),
                   child: Text(
-                    "#006",
+                    "#" + pokemonNew.id.toString().padLeft(3, '0'),
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w600,
@@ -52,8 +60,10 @@ class PokemonDetails extends StatelessWidget {
                   child: Container(
                     margin: EdgeInsets.only(left: 100, right: 100),
                     child: Hero(
-                      tag: 'pokemon',
-                      child: Image.asset('assets/images/pokemon/005.png'),
+                      tag: pokemonNew.name,
+                      child: Image.asset('assets/images/pokemon/' +
+                          pokemonNew.id.toString().padLeft(3, '0') +
+                          '.png'),
                     ),
                   ),
                 ),
@@ -63,9 +73,9 @@ class PokemonDetails extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Column(
                       children: <Widget>[
-                        _pokemonName(),
-                        _pokemonType(),
-                        _pokemonDescription(),
+                        _pokemonName(pokemonNew.name),
+                        _pokemonType(pokemonNew.types),
+                        _pokemonDescription(pokemonNew.description),
                         // _divider(context),
                         Expanded(
                           child: Container(child: NestedTabBar()),
@@ -82,9 +92,9 @@ class PokemonDetails extends StatelessWidget {
     );
   }
 
-  Widget _pokemonName() {
+  Widget _pokemonName(String name) {
     return Text(
-      "Charmeleon",
+      name,
       style: TextStyle(
         fontSize: 40,
         fontWeight: FontWeight.w400,
@@ -93,28 +103,39 @@ class PokemonDetails extends StatelessWidget {
     );
   }
 
-  Widget _pokemonType() {
-    return Chip(
-      avatar: Image.asset('assets/images/types/fire.png'),
-      backgroundColor: Color(0xFFfd7d24),
-      padding: EdgeInsets.only(left: 6, right: 6),
-      label: Text(
-        'Fire',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-        textAlign: TextAlign.center,
-      ),
+  Widget _pokemonType(List<String> types) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+
+      children: types.map<Widget>((type) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal : 8.0),
+          child: Chip(
+            avatar: Image.asset('assets/images/types/$type.png'),
+            backgroundColor:  PokemonTypeColor()
+                    .getColor(type)
+                    .item1,
+            padding: EdgeInsets.only(left: 6, right: 6),
+            label: Text(
+              type.isNotEmpty ? type[0].toUpperCase() + type.substring(1) : type,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
-  Widget _pokemonDescription() {
+  Widget _pokemonDescription(String description) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Text(
-        "Charmeleon mercilessly destroys its foes using its sharp claws. If it encounters a strong foe, it turns aggressive. In this excited state, the flame at the tip of its tail flares with a bluish white color.",
+        description,
         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
         textAlign: TextAlign.center,
       ),
@@ -137,9 +158,7 @@ class PokemonDetails extends StatelessWidget {
             radius: 12,
             backgroundColor: Colors.redAccent,
             child: Icon(
-              
               Icons.arrow_drop_up,
-              
               color: Colors.white,
             ),
           ),

@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_svg/svg.dart';
 import 'package:pokedex/nested_tab_bar.dart';
-
-import 'custom_clipper.dart';
+import 'package:pokedex/pokemon.dart';
+import 'package:pokedex/pokemon_type_color.dart';
 
 class PokemonDetailsExpanded extends StatefulWidget {
+  final PokemonNew pokemon;
+  PokemonDetailsExpanded({this.pokemon});
   @override
-  _PokemonDetailsExpandedState createState() => _PokemonDetailsExpandedState();
+  _PokemonDetailsExpandedState createState() =>
+      _PokemonDetailsExpandedState(pokemon: pokemon);
 }
 
 class _PokemonDetailsExpandedState extends State<PokemonDetailsExpanded> {
+  final PokemonNew pokemon;
+  _PokemonDetailsExpandedState({this.pokemon});
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFF8A54F),
+        backgroundColor:
+            PokemonTypeColor().getColor(pokemon.types.elementAt(0)).item1,
         elevation: 0,
         // leading: Icon(
         //   Icons.chevron_left,
@@ -26,7 +31,7 @@ class _PokemonDetailsExpandedState extends State<PokemonDetailsExpanded> {
           Padding(
             padding: EdgeInsets.fromLTRB(8.0, 14.0, 12.0, 8.0),
             child: Text(
-              "#005",
+              "#" + pokemon.id.toString().padLeft(3, '0'),
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.w600,
@@ -43,13 +48,13 @@ class _PokemonDetailsExpandedState extends State<PokemonDetailsExpanded> {
             Expanded(
               flex: 1,
               child: Container(
-                color: Color(0xFFF8A54F),
+                color:  PokemonTypeColor().getColor(pokemon.types.elementAt(0)).item1,
                 child: Column(
                   children: <Widget>[
                     Expanded(
-                      child: _pokemonImage(),
+                      child: _pokemonImage(pokemon.id,pokemon.name),
                     ),
-                    _pokemonName(),
+                    _pokemonName(pokemon.name),
                   ],
                 ),
               ),
@@ -66,21 +71,23 @@ class _PokemonDetailsExpandedState extends State<PokemonDetailsExpanded> {
     );
   }
 
-  Widget _pokemonImage() {
+  Widget _pokemonImage(int id, String name) {
     return Center(
       // child: SvgPicture.asset('images/5.svg'),
       child: Hero(
-        tag: 'pokemon',
-        child: Image.asset('assets/images/pokemon/005.png'),
+        tag: name,
+        child: Image.asset('assets/images/pokemon/' +
+            pokemon.id.toString().padLeft(3, '0') +
+            '.png'),
       ),
     );
   }
 
-  Widget _pokemonName() {
+  Widget _pokemonName(String name) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
-        "Charmeleon",
+        name,
         style: TextStyle(
             fontSize: 36, fontWeight: FontWeight.w600, color: Colors.white),
       ),
