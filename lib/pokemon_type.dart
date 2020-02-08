@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
-
 class Type {
   static const normal = Tuple2<String, Color>("normal", Color(0xFF9A9DA1));
   static const dragon = Tuple2<String, Color>("dragon", Color(0xFF0773C7));

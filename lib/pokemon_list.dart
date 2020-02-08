@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:pokedex/custom_clipper.dart';
 import 'package:pokedex/pokemon.dart';
-import 'package:flutter_layout_grid/flutter_layout_grid.dart';
+import 'package:pokedex/pokemon_type_color.dart';
 
 class PokemonList extends StatelessWidget {
   @override
@@ -51,76 +51,74 @@ class PokemonList extends StatelessWidget {
         shrinkWrap: true,
         childAspectRatio: 1.4,
         children: List.generate(pokemons.length, (index) {
+          Color primaryColor = PokemonTypeColor()
+                    .getColor(pokemons[index].types.elementAt(0))
+                    .item1;
+          Color secondaryColor = PokemonTypeColor()
+                    .getColor(pokemons[index].types.elementAt(0))
+                    .item2;
           return Padding(
             padding: const EdgeInsets.all(5.0),
             child: Container(
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.greenAccent,
+                color: primaryColor,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.only(left: 8.0, top: 8.0),
                     child: Text(
                       pokemons[index].name,
                       style: TextStyle(fontSize: 24, color: Colors.white),
                     ),
                   ),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 8.0, left: 8.0, bottom: 8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 3,
-                            child: Text(
-                              pokemons[index].name,
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.white),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children:
+                                  pokemons[index].types.map<Widget>((type) {
+                                return _pokemonType(type, secondaryColor);
+                              }).toList(),
                             ),
                           ),
-                          Expanded(
-                            flex: 5,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 4.0,
-                                  left: 32.0,
-                                  right: 4.0,
-                                  bottom: 4.0),
-                              child: Stack(
-                                children: <Widget>[
-                                  ClipPath(
-                                    clipper: PokeballClipper(),
-                                   
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.redAccent,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      height: 150,
-                                      width: 150,
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Stack(
+                            children: <Widget>[
+                              CustomPaint(
+                                painter: ShapesPainter(
+                                    main: primaryColor, pokeball: secondaryColor),
+                                child: Container(
+                                    // color:  Colors.redAccent,
                                     ),
-                                  ),
-                                  Image.asset(
-                                    "assets/images/pokemon/" +
-                                        pokemons[index]
-                                            .id
-                                            .toString()
-                                            .padLeft(3, '0') +
-                                        ".png",
-                                  ),
-                                ],
                               ),
-                            ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Image.asset(
+                                  "assets/images/pokemon/" +
+                                      pokemons[index]
+                                          .id
+                                          .toString()
+                                          .padLeft(3, '0') +
+                                      ".png",
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   )
                 ],
@@ -128,6 +126,26 @@ class PokemonList extends StatelessWidget {
             ),
           );
         }),
+      ),
+    );
+  }
+
+  Widget _pokemonType(String type, Color background) {
+    return Chip(
+      avatar: CircleAvatar(
+          radius: 10,
+          backgroundColor: Colors.transparent,
+          child: Image.asset('assets/images/types/$type.png')),
+      backgroundColor: background,
+      // padding: EdgeInsets.only(left: 4, right: 4),
+      label: Text(
+        type.isNotEmpty ? type[0].toUpperCase() + type.substring(1) : type,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }
