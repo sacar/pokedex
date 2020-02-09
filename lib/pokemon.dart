@@ -3,6 +3,7 @@ class PokemonNew {
   final int id;
   final String description;
   final List<String> types;
+  
 
   PokemonNew({this.name, this.id, this.description, this.types});
 
